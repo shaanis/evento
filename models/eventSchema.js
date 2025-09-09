@@ -26,9 +26,13 @@ const eventSchema = new mongoose.Schema(
       required: true,
       match: [/^[0-9]{10}$/, "Please enter a valid 10-digit phone number"],
     },
-    location: {
+      status: {
       type: String,
       required: true,
+    },
+    location: {
+      type: String,
+      required: false,
       trim: true,
     },
     latitude: {
