@@ -5,23 +5,58 @@ exports.addEvent = async (req, res) => {
   try {
     console.log("📥 Event request body:", req.body);
 
-    const { title, venue, date, customer, phone, location, latitude, longitude ,status} = req.body;
-
-    // Required fields validation
-    if (!title || !venue || !date || !customer || !phone  || !status) {
-      return res.status(400).json({ message: "❌ Missing required fields" });
-    }
-
-    const newEvent = new Event({
+    const {
       title,
       venue,
       date,
       customer,
       phone,
+      location,
+      latitude,
+      longitude,
       status,
-      ...(location && { location }),   // add only if provided
-      ...(latitude && { latitude }),   // add only if provided
-      ...(longitude && { longitude }), // add only if provided
+      visibleForStaff,
+      time,
+      addedby,
+    } = req.body;
+
+    // Required fields validation
+    if (
+      !title ||
+      !venue ||
+      !date ||
+      !customer ||
+      !phone ||
+      !status ||
+      !visibleForStaff ||
+      !time ||
+      !addedby
+    ) {
+      return res.status(400).json({ message: "❌ Missing required fields" });
+    }
+
+    // 🔍 Duplicate check: same venue, date, and time
+    const existingEvent = await Event.findOne({ venue, date, time });
+    if (existingEvent) {
+      return res
+        .status(409)
+        .json({ message: "❌ Event already exists at this venue, date, and time" });
+    }
+
+    // Create new event
+    const newEvent = new Event({
+      title,
+      venue,
+      date,
+      time,
+      customer,
+      phone,
+      status,
+      addedby,
+      visibleForStaff,
+      ...(location && { location }),
+      ...(latitude && { latitude }),
+      ...(longitude && { longitude }),
     });
 
     await newEvent.save();
@@ -32,9 +67,12 @@ exports.addEvent = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error creating event:", error.message);
-    res.status(500).json({ message: "Error creating event", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating event", error: error.message });
   }
 };
+
 
 
 // ✅ Get all admin events
@@ -87,7 +125,7 @@ exports.getEvents = async (req, res) => {
 
 exports.allevents = async (req,res)=>{
     try {
-        const all = await Event.find()
+        const all = await Event.find().sort({createdAt:-1})
         res.status(200).json(all)
     } catch (e) {
         res.status(401).json(e)

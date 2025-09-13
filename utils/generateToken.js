@@ -2,8 +2,13 @@
 const jwt = require("jsonwebtoken");
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWTPASSWORD, {
-    expiresIn: "7d", // valid for 7 days
+  const secret = process.env.JWTPASSWORD;
+  if (!secret) {
+    throw new Error("JWTPASSWORD is not defined in environment variables");
+  }
+
+  return jwt.sign({ id }, secret, {
+    expiresIn: "30d",
   });
 };
 

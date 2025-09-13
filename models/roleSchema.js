@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 
 const roleSchema = new mongoose.Schema(
   {
-    roleTitle: {
+    role: {
       type: String,
       required: [true, "Role title is required"],
       trim: true,
     },
-    workWage: {
-      type: Number,
+    wage: {
+      type: String,
       required: [true, "Work wage is required"],
-      min: 0,
+      
     },
   },
   { timestamps: true }

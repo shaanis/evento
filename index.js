@@ -7,6 +7,7 @@ const userRoute = require("./routes/userRoute")
 const eventRouter = require("./routes/eventRoutes")
 const roleRouter = require("./routes/roleRoutes")
 const careofRouter = require("./routes/careofRoutes")
+const loginRouter = require("./routes/loginRoutes")
 
 const app = express()
 connectDB()
@@ -21,6 +22,7 @@ app.use(userRoute)
 app.use(eventRouter)
 app.use(roleRouter)
 app.use(careofRouter)
+app.use(loginRouter)
 
 
 const PORT = process.env.PORT || 3000;

@@ -2,19 +2,36 @@ const Role = require("../models/roleSchema");
 
 // ➕ Add New Role
 exports.addRole = async (req, res) => {
-  try {
-    const { roleTitle, workWage } = req.body;
 
-    if (!roleTitle || !workWage) {
+
+  
+  
+  try {
+    const { role, wage } = req.body;
+
+    if (!role || !wage) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const existingRole = await Role.findOne({ role: { $regex: new RegExp(`^${role}$`, "i") } });
+
+    if (existingRole) {
+      return res.status(409).json({ 
+        success: false, 
+        message: "Role already exists", 
+        data: existingRole 
+      });
+    }
+
     const newRole = new Role({
-      roleTitle,
-      workWage,
+      role,
+      wage,
     });
 
     await newRole.save();
+
+   
+    
 
     res.status(201).json({
       success: true,
@@ -38,13 +55,19 @@ exports.getRoles = async (req, res) => {
 
 // ✏️ Update Role
 exports.updateRole = async (req, res) => {
+
+  console.log("Update Role Called");
+  
   try {
     const { id } = req.params;
-    const { roleTitle, workWage } = req.body;
+    const { role, wage } = req.body;
+
+   
+    
 
     const updatedRole = await Role.findByIdAndUpdate(
       id,
-      { roleTitle, workWage },
+      { role, wage },
       { new: true, runValidators: true }
     );
 
@@ -58,6 +81,8 @@ exports.updateRole = async (req, res) => {
       data: updatedRole,
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({ success: false, message: error.message });
   }
 };
