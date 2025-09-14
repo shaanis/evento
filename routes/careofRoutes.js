@@ -1,11 +1,14 @@
+// routes/careofRoutes.js
 const express = require("express");
 const careofRouter = express.Router();
 const careOfController = require("../controllers/careofController");
-const multer = require("../middleware/multerMiddleware"); // if you want image upload
+const multerMiddleware = require("../middleware/multerMiddleware");
 
-careofRouter.post("/careof/add", multer.single("profileImage"), careOfController.addCareOf);
-careofRouter.get("/careof/all", careOfController.getCareOf);
-careofRouter.put("/careof/update/:id", multer.single("profileImage"), careOfController.updateCareOf);
-careofRouter.delete("/careof/delete/:id", careOfController.deleteCareOf);
+// CareOf routes with file upload support
+careofRouter.post("/add/careof", multerMiddleware.single("file"), careOfController.saveCareOf);
+careofRouter.get("/get/careof", careOfController.getAllCareOf);
+careofRouter.get("/get/careof/:id", careOfController.getCareOfById);
+careofRouter.put("/update/careof/:id", multerMiddleware.single("file"), careOfController.updateCareOf);
+careofRouter.delete("/delete/careof/:id", careOfController.deleteCareOf);
 
 module.exports = careofRouter;

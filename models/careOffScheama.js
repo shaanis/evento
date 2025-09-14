@@ -1,13 +1,13 @@
-// models/careOf.js
 const mongoose = require("mongoose");
 
 const careOfSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  phone: String,
-  address: String,
-  addedby: String,
-  username: String, // also assign uniqueCode here
+  name: { type: String },
+  email: { type: String },
+  phone: { type: String},
+  address: { type: String},
+  addedby: { type: String},
+  username: { type: String},
+  image: { type: String }, // Cloudinary image URL
 });
 
 module.exports = mongoose.model("CareOf", careOfSchema);

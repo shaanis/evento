@@ -17,7 +17,7 @@ exports.addCateringStaff = async (req, res) => {
 
 
   try {
-    const { name, email, phone, addedby, address, careOf } = req.body;
+    const { name, email, phone, addedby, address, careOf, blocked } = req.body;
 
     // ✅ Duplicate check
     const existingUser = await User.findOne({ email });
@@ -26,7 +26,7 @@ exports.addCateringStaff = async (req, res) => {
       return res.status(409).json({ message: "Email already exists" });
 
     }
- const role = req.body.role && req.body.role !== "" ? req.body.role : null;
+    const role = req.body.role && req.body.role !== "" ? req.body.role : null;
 
 
 
@@ -51,6 +51,7 @@ exports.addCateringStaff = async (req, res) => {
       role,
       addedby,
       address,
+      blocked: blocked === 'true' || blocked === true,
       careof: careOf === "true" || careOf === true,
       password: autoPassword,
       userCode,
@@ -66,6 +67,7 @@ exports.addCateringStaff = async (req, res) => {
     if (careOf === "true" || careOf === true) {
       const username = name + phone.substring(0, 4);
       await new CareOf({
+        image: profileImage,
         name,
         email,
         phone,
@@ -99,7 +101,7 @@ exports.updateCateringStaff = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const { name, email, phone, role, address, careOf } = req.body;
+    const { name, email, phone, role, address, careOf, blocked } = req.body;
 
     // ✅ Check if staff exists
     const staff = await User.findById(id);
@@ -128,6 +130,7 @@ exports.updateCateringStaff = async (req, res) => {
     staff.role = role && role !== "" ? role : null;
     staff.address = address ?? staff.address;
     staff.careof = careOf === "true" || careOf === true;
+    staff.blocked = blocked === "true" || blocked === true;
 
     // ✅ Save updates
     await staff.save();
@@ -177,7 +180,7 @@ exports.updateCateringStaff = async (req, res) => {
 // Get all staff
 exports.getAllStaff = async (req, res) => {
   try {
-    const staff = await User.find().sort({ createdAt: -1 });
+    const staff = await User.find({ name: { $ne: "superadmin" } }).sort({ createdAt: -1 });
     res.status(200).json(staff);
   } catch (error) {
     res.status(500).json({ message: "Error fetching staff", error: error.message });

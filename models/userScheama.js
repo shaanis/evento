@@ -13,9 +13,11 @@ const userSchema = new mongoose.Schema(
     addedby: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     address: { type: String, trim: true },
     careof: { type: Boolean, required: true, default: false },
+    blocked: { type: Boolean, required: true, default: false },
     userCode: { type: String, required: true, unique: true }, // e.g. "1001"
     qrCode: { type: String }, // base64 QR string
     password: { type: String, required: true, minlength: 6 },
+
     resetPasswordToken: { type: String },
     resetPasswordExpire: { type: Date },
   },
