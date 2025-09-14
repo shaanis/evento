@@ -91,6 +91,87 @@ exports.addCateringStaff = async (req, res) => {
   }
 };
 
+//update
+exports.updateCateringStaff = async (req, res) => {
+  console.log("📥 Inside updateCateringStaff");
+  console.log("Body:", req.body);
+  console.log("File:", req.file);
+
+  try {
+    const { id } = req.params;
+    const { name, email, phone, role, address, careOf } = req.body;
+
+    // ✅ Check if staff exists
+    const staff = await User.findById(id);
+    if (!staff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
+
+    // ✅ Duplicate email check (skip self)
+    if (email && email !== staff.email) {
+      const existingUser = await User.findOne({ email });
+      const existingCareOf = await CareOf.findOne({ email });
+      if (existingUser || existingCareOf) {
+        return res.status(409).json({ message: "Email already exists" });
+      }
+    }
+
+    // ✅ Update profile image if uploaded
+    if (req.file) {
+      staff.profileImage = req.file.path;
+    }
+
+    // ✅ Update fields
+    staff.name = name ?? staff.name;
+    staff.email = email ?? staff.email;
+    staff.phone = phone ?? staff.phone;
+    staff.role = role && role !== "" ? role : null;
+    staff.address = address ?? staff.address;
+    staff.careof = careOf === "true" || careOf === true;
+
+    // ✅ Save updates
+    await staff.save();
+
+    console.log("✅ Staff updated:", staff);
+
+    // ✅ Manage CareOf collection
+    if (careOf === "true" || careOf === true) {
+      let careOfRecord = await CareOf.findOne({ email: staff.email });
+      if (!careOfRecord) {
+        const username = staff.name + staff.phone.substring(0, 4);
+        careOfRecord = new CareOf({
+          name: staff.name,
+          email: staff.email,
+          phone: staff.phone,
+          address: staff.address,
+          addedby: staff.addedby,
+          username,
+        });
+      } else {
+        careOfRecord.name = staff.name;
+        careOfRecord.phone = staff.phone;
+        careOfRecord.address = staff.address;
+      }
+      await careOfRecord.save();
+    } else {
+      // if no longer careOf, remove from CareOf collection
+      await CareOf.findOneAndDelete({ email: staff.email });
+    }
+
+    res.status(200).json({
+      message: "Catering staff updated successfully",
+      staff,
+    });
+  } catch (error) {
+    console.error("❌ Error updating staff:", error);
+    res.status(400).json({
+      message: "Error updating staff",
+      error: error.message,
+    });
+  }
+};
+
+
 
 
 // Get all staff
