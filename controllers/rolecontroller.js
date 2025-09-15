@@ -62,6 +62,7 @@ exports.updateRole = async (req, res) => {
     const { id } = req.params;
     const { role, wage } = req.body;
 
+  
    
     
 

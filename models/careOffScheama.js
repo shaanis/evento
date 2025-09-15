@@ -8,6 +8,7 @@ const careOfSchema = new mongoose.Schema({
   addedby: { type: String},
   username: { type: String},
   image: { type: String }, // Cloudinary image URL
+   blocked: { type: Boolean,  default: false },
 });
 
 module.exports = mongoose.model("CareOf", careOfSchema);

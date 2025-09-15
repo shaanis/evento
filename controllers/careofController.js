@@ -44,7 +44,8 @@ exports.saveCareOf = async (req, res) => {
       phone,
       address,
       addedby,
-      username
+      username,
+       blocked:  false  
     });
 
     // Save to database
@@ -91,7 +92,9 @@ exports.getAllCareOf = async (req, res) => {
 exports.updateCareOf = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, address } = req.body;
+    const { name, email, phone, address,blocked } = req.body;
+    console.log("req body",req.body);
+    
 
     // Check if CareOf exists
     const existingCareOf = await CareOf.findById(id);
@@ -120,9 +123,12 @@ exports.updateCareOf = async (req, res) => {
     // Update CareOf
     const updatedCareOf = await CareOf.findByIdAndUpdate(
       id,
-      { name, email, phone, address },
+      { name, email, phone, address,blocked  },
       { new: true, runValidators: true }
     );
+
+    console.log("updateed careof",updatedCareOf);
+    
 
     res.status(200).json({
       success: true,

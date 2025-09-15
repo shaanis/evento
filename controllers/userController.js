@@ -74,6 +74,7 @@ exports.addCateringStaff = async (req, res) => {
         address,
         addedby,
         username,
+        blocked: false
       }).save();
     }
 
@@ -158,7 +159,12 @@ exports.updateCateringStaff = async (req, res) => {
       await careOfRecord.save();
     } else {
       // if no longer careOf, remove from CareOf collection
-      await CareOf.findOneAndDelete({ email: staff.email });
+      await CareOf.findOneAndUpdate(
+        { email: staff.email },      // find by email
+        { $set: { blocked: true } }, // set blocked true
+        { new: true }                // return updated doc
+      );
+
     }
 
     res.status(200).json({
