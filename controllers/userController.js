@@ -17,7 +17,7 @@ exports.addCateringStaff = async (req, res) => {
 
 
   try {
-    const { name, email, phone, addedby, address, careOf, blocked } = req.body;
+    const { name, email, phone, addedby, address, careOf, blocked, dashboard } = req.body;
 
     // ✅ Duplicate check
     const existingUser = await User.findOne({ email });
@@ -39,28 +39,42 @@ exports.addCateringStaff = async (req, res) => {
     const profileImage = req.file ? req.file.path : "";
 
     // ✅ Generate QR Code
-    const qrPayload = { name, userCode, addedby };
-    const qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload));
-
-    // ✅ Save staff
+    // create staff without qrCode
     const newStaff = new User({
       profileImage,
       name,
       email,
       phone,
       role,
+      dashboard,
       addedby,
       address,
       blocked: blocked === 'true' || blocked === true,
       careof: careOf === "true" || careOf === true,
       password: autoPassword,
       userCode,
-      qrCode,
     });
 
+    // save once to get _id
+    await newStaff.save();
+
+    // now generate QR with _id
+    const qrPayload = {
+      _id: newStaff._id,
+      name,
+      userCode,
+      addedby
+    };
+    const qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload));
+
+    // update document with qrCode
+    newStaff.qrCode = qrCode;
     await newStaff.save();
 
     console.log("staff added :", newStaff);
+
+
+
 
 
     // ✅ If careOf staff → also save in CareOf collection
@@ -102,7 +116,7 @@ exports.updateCateringStaff = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const { name, email, phone, role, address, careOf, blocked } = req.body;
+    const { name, email, phone, role, address, careOf, blocked, dashboard } = req.body;
 
     // ✅ Check if staff exists
     const staff = await User.findById(id);
@@ -128,6 +142,7 @@ exports.updateCateringStaff = async (req, res) => {
     staff.name = name ?? staff.name;
     staff.email = email ?? staff.email;
     staff.phone = phone ?? staff.phone;
+    staff.dashboard = dashboard ?? staff.dashboard;
     staff.role = role && role !== "" ? role : null;
     staff.address = address ?? staff.address;
     staff.careof = careOf === "true" || careOf === true;
