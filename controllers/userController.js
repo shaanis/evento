@@ -67,7 +67,7 @@ exports.addCateringStaff = async (req, res) => {
     };
     const qrCode = await QRCode.toDataURL(JSON.stringify(qrPayload));
 
-    // update document with qrCode
+    // update document with qrCodeyz1
     newStaff.qrCode = qrCode;
     await newStaff.save();
 

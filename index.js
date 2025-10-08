@@ -9,6 +9,9 @@ const roleRouter = require("./routes/roleRoutes")
 const careofRouter = require("./routes/careofRoutes")
 const loginRouter = require("./routes/loginRoutes")
 const settingsRouter = require('./routes/adminSettingsRoute')
+const attandanceRouter = require('./routes/attandanceRouter')
+const originRouter = require('./routes/originLocationRoute')
+const fineRouter = require('./routes/fineRouters')
 
 const app = express()
 connectDB()
@@ -23,8 +26,11 @@ app.use(userRoute)
 app.use(eventRouter)
 app.use(roleRouter)
 app.use(careofRouter)
-app.use(loginRouter)
+app.use(loginRouter)    
 app.use(settingsRouter)
+app.use(attandanceRouter)
+app.use(originRouter)
+app.use(fineRouter)
 
 
 const PORT = process.env.PORT || 3000;

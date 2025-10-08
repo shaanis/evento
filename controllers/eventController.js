@@ -28,10 +28,10 @@ exports.addEvent = async (req, res) => {
       !customer ||
       !phone ||
       !status ||
-      !visibleForStaff ||
       !time ||
       !addedby
     ) {
+      console.log("❌ Missing required fields");
       return res.status(400).json({ message: "❌ Missing required fields" });
     }
 
@@ -167,10 +167,16 @@ exports.updateEvent = async (req, res) => {
 
     const updatedEvent = await Event.findByIdAndUpdate(id, updates, { new: true });
 
+    console.log(req.body);
+    
+
     if (!updatedEvent) {
       return res.status(404).json({ message: "❌ Event not found" });
     }
 
+
+    console.log("updated event ",updatedEvent);
+    
     res.status(200).json({
       message: "✅ Event updated successfully",
       event: updatedEvent,
